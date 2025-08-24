@@ -12,6 +12,7 @@ import com.wings.githubwings.framework.network.base.NetworkResult
 import com.wings.githubwings.framework.properties.ISPPropertyInterface
 import com.wings.githubwings.framework.properties.SPManager
 import com.wings.githubwings.framework.service.center.ServiceCenter
+import com.wings.githubwings.model.api.GithubServiceApi
 import com.wings.githubwings.model.bean.GitHubRepo
 import com.wings.githubwings.model.bean.RepoSearchResponse
 import com.wings.githubwings.model.bean.User
@@ -24,29 +25,24 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import kotlinx.coroutines.test.runTest
-import org.mockito.Mockito.mock
 
 @ExperimentalCoroutinesApi
 class SearchRepositoryTest {
 
     @Mock
-    private lateinit var mockApiService: com.wings.githubwings.model.api.GithubServiceApi
+    private lateinit var mockApiService: GithubServiceApi
 
     private lateinit var searchRepository: SearchRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        // 注意：由于BaseRepository中使用ServiceCenter获取服务，这里无法直接注入mock对象
-        // 在实际项目中，应该修改BaseRepository以支持依赖注入
-        val netConfig = RetrofitNetConfig(BuildConfig.httpBaseUrl)
-        val netClient = RetrofitClient(netConfig)
-        ServiceCenter.put(INetworkClient::class.java.name, NetworkManager(netClient))
+        mockApiService = mock(GithubServiceApi::class.java)
 
-        searchRepository = SearchRepository()
+        searchRepository = SearchRepository(mockApiService)
     }
 
     @Test
@@ -91,9 +87,15 @@ class SearchRepositoryTest {
             items = mockRepositories
         )
 
-        // 注意：由于无法直接mock apiService，这里仅展示测试结构
-        // 在实际项目中，应该重构BaseRepository以支持依赖注入
-
+        `when`(
+            mockApiService.searchRepositories(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyInt(),
+            )
+        ).thenReturn(NetworkResult.Success(mockResponse))
         // Act
         val result = searchRepository.searchRepositories("testQuery", 1)
 
@@ -104,17 +106,28 @@ class SearchRepositoryTest {
         assertEquals(1, result.data.items.size)
         assertEquals("Repo1", result.data.items[0].name)
 
-        verify(mockApiService).searchRepositories(anyString(), anyInt().toString())
+        verify(mockApiService).searchRepositories(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyInt()
+        )
     }
 
     @Test
     fun `searchRepositories should handle error and return error result`() = runTest {
-        // Arrange
-        // 注意：由于无法直接mock apiService，这里仅展示测试结构
-        // 在实际项目中，应该重构BaseRepository以支持依赖注入
 
-        // `when`(mockApiService.searchRepositories(anyString(), anyInt()))
-        //     .thenThrow(RuntimeException("Network error"))
+        `when`(
+            mockApiService.searchRepositories(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyInt()
+            )
+        )
+            .thenThrow(RuntimeException("Network error"))
 
         // Act
         val result = searchRepository.searchRepositories("testQuery", 1)
@@ -125,6 +138,12 @@ class SearchRepositoryTest {
         assertNotNull(errorResult.exception)
         assertEquals("Network error", errorResult.exception.message)
 
-        verify(mockApiService).searchRepositories(anyString(), anyInt().toString())
+        verify(mockApiService).searchRepositories(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyInt()
+        )
     }
 }

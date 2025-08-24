@@ -2,6 +2,7 @@ package com.wings.githubwings.data.repository
 
 import com.wings.githubwings.biz.detail.DetailRepository
 import com.wings.githubwings.framework.network.base.NetworkResult
+import com.wings.githubwings.model.api.GithubServiceApi
 import com.wings.githubwings.model.bean.GitHubRepo
 import com.wings.githubwings.model.bean.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,11 +12,13 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.mock
 
 @ExperimentalCoroutinesApi
 class DetailRepositoryTest {
@@ -28,9 +31,8 @@ class DetailRepositoryTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        // 注意：由于BaseRepository中使用ServiceCenter获取服务，这里无法直接注入mock对象
-        // 在实际项目中，应该修改BaseRepository以支持依赖注入
-        detailRepository = DetailRepository()
+        mockApiService = mock(GithubServiceApi::class.java)
+        detailRepository = DetailRepository(mockApiService)
     }
 
     @Test
@@ -66,10 +68,12 @@ class DetailRepositoryTest {
             topics = listOf("topic1", "topic2"),
             default_branch = "main"
         )
-
-        // 注意：由于无法直接mock apiService，这里仅展示测试结构
-        // 在实际项目中，应该重构BaseRepository以支持依赖注入
-
+        `when`(
+            mockApiService.getRepoDetail(
+                anyString(),
+                anyString(),
+            )
+        ).thenReturn(NetworkResult.Success(mockRepo))
         // Act
         val result = detailRepository.getRepoDetail("owner", "repo")
 
@@ -88,8 +92,8 @@ class DetailRepositoryTest {
         // 注意：由于无法直接mock apiService，这里仅展示测试结构
         // 在实际项目中，应该重构BaseRepository以支持依赖注入
 
-        // `when`(mockApiService.getRepoDetail(anyString(), anyString()))
-        //     .thenThrow(RuntimeException("Network error"))
+        `when`(mockApiService.getRepoDetail(anyString(), anyString()))
+            .thenThrow(RuntimeException("Network error"))
 
         // Act
         val result = detailRepository.getRepoDetail("owner", "repo")
