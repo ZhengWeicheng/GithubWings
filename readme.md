@@ -25,7 +25,7 @@ The business implementation can be divided into Repository, UI, and ViewModel:
 
 4. **AppNavGraph**: Page navigation that holds the external activity's MainViewModel, so page jumps
    can obtain MainViewModel to monitor login status and network changes.
-   [Structure diagram as follows:](doc/1756025016195.png)
+   ![Structure diagram as follows:](doc/1756025016195.png)
 
 ## Project Structure
 
@@ -47,7 +47,7 @@ etc.
 
 ### Application Layering
 
-[Architecture as follows:](doc/1756022090912.png)
+![Architecture as follows:](doc/1756022090912.png)
 
 ## Main Ideas
 
@@ -60,4 +60,13 @@ they can only see the interfaces. Therefore, ServiceCenter is defined in the bas
 long-life-cycle Services in the project. Through interfaces as keys, Services are put together,
 providing possibilities for future plug-and-play functionality implementation.
 
-[ServiceCenter](doc/1756023028101.png)
+![ServiceCenter](doc/1756023028101.png)
+
+### Features
+
+Search for GitHub repositories by keyword.
+View detailed information about a repository.
+Create issues for a repository.
+Login to GitHub using OAuth.
+View user profile information.
+Browse user repositories.
