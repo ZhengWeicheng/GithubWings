@@ -22,7 +22,22 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             _authState.value = loginService.isLoggedIn()
         }
+        refreshTokenIfNeed()
+    }
 
+    fun refreshTokenIfNeed() {
+        viewModelScope.launch {
+            if (loginService.isNeedRefreshToken()) {
+                val result = LoginRepository().refreshToken()
+                when (result) {
+                    is NetworkResult.Success -> {
+                        _authState.value = true
+                    }
+
+                    else -> {}
+                }
+            }
+        }
     }
 
     fun handleGithubAuthCode(code: String) {

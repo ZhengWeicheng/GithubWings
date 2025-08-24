@@ -69,7 +69,7 @@ fun MineScreen(
                 showLogoutDialog.value = true
             }) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = "Logout"
                 )
             }

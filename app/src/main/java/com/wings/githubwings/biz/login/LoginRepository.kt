@@ -11,6 +11,7 @@ import com.wings.githubwings.framework.service.center.ServiceCenter
 import com.wings.githubwings.model.api.AuthServiceApi
 import com.wings.githubwings.model.api.GithubServiceApi
 import com.wings.githubwings.model.bean.AccessTokenResp
+import com.wings.githubwings.model.bean.RefreshTokenResp
 import com.wings.githubwings.model.bean.User
 
 class LoginRepository(
@@ -34,7 +35,9 @@ class LoginRepository(
                 val accessTokenResp = result.data
                 loginService.saveAuthInfo(
                     accessTokenResp.access_token,
-                    accessTokenResp.expires_in + System.currentTimeMillis() / 1000
+                    accessTokenResp.expires_in + System.currentTimeMillis() / 1000,
+                    accessTokenResp.refresh_token,
+                    accessTokenResp.refresh_token_expires_in + System.currentTimeMillis() / 1000
                 )
                 val user =
                     apiService.getCurrentUser(token = "Bearer ${accessTokenResp.access_token}")
@@ -52,6 +55,27 @@ class LoginRepository(
         } catch (e: Exception) {
             e.printStackTrace()
             return NetworkResult.Error(e)
+        }
+    }
+
+    suspend fun refreshToken(): NetworkResult<RefreshTokenResp> {
+        return safeApiCall {
+            val result = authService.refreshToken(
+                clientId = BuildConfig.clientId,
+                clientSecret = BuildConfig.clientSecret,
+                refreshToken = LoginService.RefreshToken.getValue()
+            )
+            if (result is NetworkResult.Success) {
+                val refreshTokenResp = result.data
+                val loginService = ServiceCenter.getService<ILoginApi>()!!
+                loginService.saveAuthInfo(
+                    refreshTokenResp.access_token,
+                    refreshTokenResp.expires_in + System.currentTimeMillis() / 1000,
+                    refreshTokenResp.refresh_token,
+                    refreshTokenResp.refresh_token_expires_in + System.currentTimeMillis() / 1000
+                )
+            }
+            result
         }
     }
 

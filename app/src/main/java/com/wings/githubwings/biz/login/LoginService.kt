@@ -14,6 +14,9 @@ class LoginService : AbsService(), ILoginApi {
         val AccessToken: SPProperty<String> = SPProperty("AccessToken", "")
         val UserJson: SPProperty<String> = SPProperty("UserJson", "")
         val ExpireTime: SPProperty<Long> = SPProperty("ExpireTime", 0)
+        val RefreshToken: SPProperty<String> = SPProperty("RefreshToken", "")
+        val RefreshTokenExpireTime: SPProperty<Long> = SPProperty("RefreshTokenExpireTime", 0)
+
     }
 
     override fun isLoggedIn(): Boolean {
@@ -31,11 +34,18 @@ class LoginService : AbsService(), ILoginApi {
         return "Bearer $result"
     }
 
-    override suspend fun saveAuthInfo(accessToken: String, expireTime: Long) {
+    override suspend fun saveAuthInfo(
+        accessToken: String,
+        expireTime: Long,
+        refreshToken: String,
+        refreshTokenExpireTime: Long
+    ) {
         FLog.debug("login", "saveAuthInfo: $accessToken, $expireTime")
         LoginState.setValue(true)
         AccessToken.setValue(accessToken)
         ExpireTime.setValue(expireTime)
+        RefreshToken.setValue(refreshToken)
+        RefreshTokenExpireTime.setValue(refreshTokenExpireTime)
     }
 
     override fun clearAuthInfo() {
@@ -45,6 +55,8 @@ class LoginService : AbsService(), ILoginApi {
         UserName.setValue("")
         UserJson.setValue("")
         ExpireTime.setValue(0)
+        RefreshToken.setValue("")
+        RefreshTokenExpireTime.setValue(0)
     }
 
     override fun getUserName(): Flow<String> = flow {
@@ -61,5 +73,12 @@ class LoginService : AbsService(), ILoginApi {
 
     override fun getCurrentUser(): String {
         return UserJson.getValue()
+    }
+
+    override suspend fun isNeedRefreshToken(): Boolean {
+        val curTime = System.currentTimeMillis() / 1000
+        val tokenExpireTime = ExpireTime.getValue()
+        return curTime - tokenExpireTime <= 1800
+
     }
 }
