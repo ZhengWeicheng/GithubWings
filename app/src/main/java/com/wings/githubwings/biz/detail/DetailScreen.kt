@@ -63,7 +63,7 @@ fun DetailScreen(
     val reposState by viewModel.commonUIState.collectAsState()
     BaseScreen(
         viewModel = viewModel,
-        title = "仓库详情",
+        title = "Repository Details",
         showAppBar = true,
         onBackClick = back
     ) { padding, data ->

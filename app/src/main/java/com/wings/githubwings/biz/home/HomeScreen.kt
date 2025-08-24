@@ -22,7 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import com.wings.githubwings.ui.common.BaseScreen
@@ -42,23 +44,7 @@ fun HomeScreen(
     goToProfile: () -> Unit,
     gotoSearch: () -> Unit,
 ) {
-    val listState = rememberLazyListState()
     val reposState by viewModel.commonUIState.collectAsState()
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            if (reposState is CommonUIState.Success) {
-                val layoutInfo = listState.layoutInfo
-                val totalItems = layoutInfo.totalItemsCount
-                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-
-                lastVisibleItem >= totalItems - 3 // 当用户接近底部时加载更多
-            } else false
-        }.collectLatest { shouldLoadMore ->
-            if (shouldLoadMore && reposState is CommonUIState.Success) {
-                viewModel.onLoadMore()
-            }
-        }
-    }
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
@@ -67,7 +53,7 @@ fun HomeScreen(
     val isLogin by viewModel.isLogin.collectAsState()
     BaseScreen(
         viewModel = viewModel,
-        title = "首页",
+        title = "Recommend",
         showAppBar = true,
         navigation = {
             IconButton(onClick = { goToProfile() }) {
@@ -100,9 +86,10 @@ fun HomeScreen(
                 is HomeUIContent -> {
                     RepoList(
                         repositories = data.repositoriesList,
-                        listState = listState,
                         isLoadingMore = data.isLoadingMore,
                         hasMoreData = data.hasMoreData,
+                        uiContext = data,
+                        viewModel = viewModel,
                     ) { owner, repo ->
                         goToRepositoryDetails(owner, repo)
                     }
@@ -120,44 +107,77 @@ fun HomeScreen(
 @Composable
 private fun RepoList(
     repositories: List<GitHubRepo>,
-    listState: LazyListState,
     isLoadingMore: Boolean,
     hasMoreData: Boolean,
+    uiContext: HomeUIContent,
+    viewModel: HomeViewModel,
     onItemClick: (owner: String, repo: String) -> Unit
 ) {
-    LazyColumn(
-        state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        items(
-            count = repositories.size,
-            key = { index -> repositories[index].id }
-        ) { index ->
-            val repo = repositories[index]
-            RepoItem(
-                repo = repo,
-                onClick = {
-                    onItemClick(
-                        repo.owner.login,
-                        repo.name
-                    )
-                }
-            )
-        }
+    val listState = rememberLazyListState()
+    // 监听列表滚动，实现上拉加载更多
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            // 确保列表不为空且有更多数据时才计算
+            if (repositories.isEmpty() || !uiContext.hasMoreData) {
+                false
+            } else {
+                val layoutInfo = listState.layoutInfo
+                val totalItemsNumber = layoutInfo.totalItemsCount
+                val lastVisibleItemIndex =
+                    (layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                        ?: 0) + 10 // 提前10个item开始加载
 
-        if (hasMoreData && isLoadingMore) {
-            item {
-                Box(
-                    modifier = Modifier.run {
-                        fillMaxWidth()
-                            .padding(16.dp)
-                    },
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp)
-                    )
+                totalItemsNumber in 1..lastVisibleItemIndex
+            }
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore.value) {
+        // 添加额外的保护条件
+        if (shouldLoadMore.value &&
+            uiContext.hasMoreData &&
+            !uiContext.isLoadingMore &&
+            repositories.isNotEmpty() // 确保列表不为空
+        ) {
+            viewModel.onLoadMore()
+        }
+    }
+    if (repositories.isNotEmpty()) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            items(
+                count = repositories.size,
+                key = { index -> repositories[index].id }
+            ) { index ->
+                val repo = repositories[index]
+                RepoItem(
+                    repo = repo,
+                    onClick = {
+                        onItemClick(
+                            repo.owner.login,
+                            repo.name
+                        )
+                    }
+                )
+            }
+
+
+            if (hasMoreData && isLoadingMore) {
+                item {
+                    Box(
+                        modifier = Modifier.run {
+                            fillMaxWidth()
+                                .padding(16.dp)
+                        },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }

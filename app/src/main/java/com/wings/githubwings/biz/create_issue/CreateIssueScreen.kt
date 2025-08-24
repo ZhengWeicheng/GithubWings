@@ -31,7 +31,7 @@ fun CreateIssueScreen(
 ) {
     BaseScreen(
         viewModel = viewModel,
-        title = "新建问题",
+        title = "New Issue",
         showAppBar = true,
         onBackClick = back,
         idleContent = { padding ->
@@ -63,25 +63,25 @@ fun EditIssueScreen(
             OutlinedTextField(
                 value = viewModel.title,
                 onValueChange = { viewModel.title = it },
-                label = { Text(text = "标题") },
-                placeholder = { Text(text = "请输入问题标题") },
+                label = { Text(text = "Title") },
+                placeholder = { Text(text = "Please enter the issue title") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = viewModel.body,
                 onValueChange = { viewModel.body = it },
-                label = { Text(text = "内容") },
-                placeholder = { Text(text = "请详细描述问题...") },
+                label = { Text(text = "Content") },
+                placeholder = { Text(text = "Please describe the issue in detail...") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
                 supportingText = {
-                    Text("请尽可能详细地描述问题，包括复现步骤、预期结果和实际结果")
+                    Text("Please describe the issue in as much detail as possible, including reproduction steps, expected results and actual results")
                 }
             )
             Spacer(modifier = Modifier.height(16.dp))
-            // 使用Box将按钮包装起来，并设置居中对齐
+            // Wrap the button with Box and set center alignment
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -89,15 +89,15 @@ fun EditIssueScreen(
                 TextButton(
                     onClick = { viewModel.createIssue(owner, repo) },
                     modifier = Modifier
-                        .fillMaxWidth(0.33f) // 设置为屏幕宽度的三分之一
-                        .height(48.dp), // 设置高度为48dp
+                        .fillMaxWidth(0.33f) // Set to one third of the screen width
+                        .height(48.dp), // Set height to 48dp
                     colors = ButtonDefaults.textButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer, // 添加背景色
+                        containerColor = MaterialTheme.colorScheme.primaryContainer, // Add background color
                     ),
-                    shape = MaterialTheme.shapes.medium // 使用MaterialTheme的中等圆角
+                    shape = MaterialTheme.shapes.medium // Use medium rounded corners from MaterialTheme
                 ) {
                     Text(
-                        text = "提交",
+                        text = "Submit",
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }

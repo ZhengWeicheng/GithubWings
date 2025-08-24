@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
@@ -60,7 +61,7 @@ fun MineScreen(
     ShowLogoutDialog(showLogoutDialog, goToLogin, mainViewModel)
     BaseScreen(
         viewModel = viewModel,
-        title = "个人资料",
+        title = "Profile",
         showAppBar = true,
         onBackClick = back,
         actions = {
@@ -68,7 +69,7 @@ fun MineScreen(
                 showLogoutDialog.value = true
             }) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Logout"
                 )
             }

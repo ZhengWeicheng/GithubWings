@@ -64,9 +64,9 @@ providing possibilities for future plug-and-play functionality implementation.
 
 ### Features
 
-Search for GitHub repositories by keyword.
-View detailed information about a repository.
-Create issues for a repository.
-Login to GitHub using OAuth.
-View user profile information.
-Browse user repositories.
+      Search for GitHub repositories by keyword.
+      View detailed information about a repository.
+      Create issues for a repository.
+      Login to GitHub using OAuth.
+      View user profile information.
+      Browse user repositories.

@@ -106,27 +106,13 @@ class SearchRepositoryTest {
         assertEquals(1, result.data.items.size)
         assertEquals("Repo1", result.data.items[0].name)
 
-        verify(mockApiService).searchRepositories(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyInt()
-        )
+        verify(mockApiService).searchRepositories(anyString(), anyInt().toString())
     }
 
     @Test
     fun `searchRepositories should handle error and return error result`() = runTest {
 
-        `when`(
-            mockApiService.searchRepositories(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyInt()
-            )
-        )
+        `when`(mockApiService.searchRepositories(anyString(), anyInt().toString()))
             .thenThrow(RuntimeException("Network error"))
 
         // Act
@@ -138,12 +124,6 @@ class SearchRepositoryTest {
         assertNotNull(errorResult.exception)
         assertEquals("Network error", errorResult.exception.message)
 
-        verify(mockApiService).searchRepositories(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyInt()
-        )
+        verify(mockApiService).searchRepositories(anyString(), anyInt().toString())
     }
 }

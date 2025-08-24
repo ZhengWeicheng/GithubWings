@@ -1,7 +1,15 @@
 package com.wings.githubwings.ui.common
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.wings.githubwings.model.bean.GitHubRepo
+import kotlin.random.Random
 
 @Composable
 fun RepoItem(
@@ -31,12 +41,15 @@ fun RepoItem(
             .fillMaxWidth()
             .padding(8.dp)
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // 仓库名称和所有者信息
+            // Repository name and owner information
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -71,7 +84,7 @@ fun RepoItem(
                 }
             }
 
-            // 仓库描述
+            // Repository description
             repo.description?.let {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -84,23 +97,23 @@ fun RepoItem(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 底部信息栏
+            // Bottom information bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 语言标签
+                // Language tag
                 repo.language?.let {
                     LanguageBadge(language = it)
                 }
 
-                // 统计信息 - 水平排列，平均分布
+                // Statistics - horizontally arranged, evenly distributed
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // 星标数
+                    // Star count
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -117,7 +130,7 @@ fun RepoItem(
                         )
                     }
 
-                    // Fork数
+                    // Fork count
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -136,10 +149,10 @@ fun RepoItem(
                 }
             }
 
-            // 更新时间
+            // Update time
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "更新于 ${formatRelativeTime(repo.updated_at)}",
+                text = "Updated ${formatRelativeTime(repo.updated_at)}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -149,6 +162,23 @@ fun RepoItem(
 
 @Composable
 fun LanguageBadge(language: String) {
+    val colorScheme = MaterialTheme.colorScheme
+    // Generate a random background color
+    val backgroundColor = remember(language, colorScheme) {
+        val random = Random(language.hashCode())
+        val colorList = listOf(
+            colorScheme.primaryContainer,
+            colorScheme.secondaryContainer,
+            colorScheme.tertiaryContainer,
+            colorScheme.errorContainer,
+            colorScheme.primary.copy(alpha = 0.3f),
+            colorScheme.secondary.copy(alpha = 0.3f),
+            colorScheme.tertiary.copy(alpha = 0.3f),
+            colorScheme.error.copy(alpha = 0.3f)
+        )
+        colorList[random.nextInt(colorList.size)]
+    }
+    
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -156,14 +186,14 @@ fun LanguageBadge(language: String) {
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         val color = when (language.lowercase()) {
-            "kotlin" -> MaterialTheme.colorScheme.primary
-            "java" -> MaterialTheme.colorScheme.tertiary
-            "python" -> MaterialTheme.colorScheme.secondary
-            "javascript" -> MaterialTheme.colorScheme.error
-            "typescript" -> MaterialTheme.colorScheme.primaryContainer
-            "go" -> MaterialTheme.colorScheme.secondaryContainer
-            "rust" -> MaterialTheme.colorScheme.tertiaryContainer
-            else -> MaterialTheme.colorScheme.outline
+            "kotlin" -> colorScheme.primary
+            "java" -> colorScheme.tertiary
+            "python" -> colorScheme.secondary
+            "javascript" -> colorScheme.error
+            "typescript" -> colorScheme.primaryContainer
+            "go" -> colorScheme.secondaryContainer
+            "rust" -> colorScheme.tertiaryContainer
+            else -> colorScheme.outline
         }
 
         androidx.compose.foundation.Canvas(
@@ -182,7 +212,7 @@ fun LanguageBadge(language: String) {
     }
 }
 
-// 格式化数字显示，例如 1000 -> 1k
+// Format number display, e.g. 1000 -> 1k
 fun formatCount(count: Int): String {
     return when {
         count >= 1000000 -> "${(count / 1000000f).format(1)}m"
@@ -191,7 +221,7 @@ fun formatCount(count: Int): String {
     }
 }
 
-// 格式化相对时间显示
+// Format relative time display
 fun formatRelativeTime(dateString: String): String {
     return try {
         val date =
@@ -205,17 +235,17 @@ fun formatRelativeTime(dateString: String): String {
         val days = hours / 24
 
         when {
-            days > 0 -> "${days}天前"
-            hours > 0 -> "${hours}小时前"
-            minutes > 0 -> "${minutes}分钟前"
-            else -> "刚刚"
+            days > 0 -> "${days} days ago"
+            hours > 0 -> "${hours} hours ago"
+            minutes > 0 -> "${minutes} minutes ago"
+            else -> "just now"
         }
     } catch (e: Exception) {
         dateString
     }
 }
 
-// 扩展函数用于格式化浮点数
+// Extension function to format floating point numbers
 fun Float.format(digits: Int) = java.math.BigDecimal(this.toString())
     .setScale(digits, java.math.RoundingMode.HALF_UP)
     .toDouble()

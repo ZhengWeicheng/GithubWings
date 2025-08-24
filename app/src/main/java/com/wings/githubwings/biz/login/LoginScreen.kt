@@ -47,7 +47,7 @@ fun LoginScreen(
     val context = LocalContext.current
     BaseScreen(
         viewModel = viewModel,
-        title = "登录",
+        title = "Login",
         showAppBar = true,
         onBackClick = back,
         idleContent = {},

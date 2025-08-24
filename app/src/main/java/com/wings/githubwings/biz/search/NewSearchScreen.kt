@@ -40,7 +40,7 @@ fun NewSearchScreen(
     val systemUiController = rememberSystemUiController()
     val isDarkTheme = isSystemInDarkTheme()
     val primaryColor = MaterialTheme.colorScheme.primary
-    // 设置状态栏颜色
+    // Set status bar color
     SideEffect {
         systemUiController.setStatusBarColor(
             color = primaryColor,
@@ -54,7 +54,7 @@ fun NewSearchScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("搜索", style = MaterialTheme.typography.titleLarge) },
+                title = { Text("Search", style = MaterialTheme.typography.titleLarge) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -63,7 +63,7 @@ fun NewSearchScreen(
                     IconButton(onClick = back) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "返回",
+                            contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -77,18 +77,18 @@ fun NewSearchScreen(
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                // 搜索输入框
+                // Search input field
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    label = { Text("输入仓库名称") },
+                    label = { Text("Enter repository name") },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "搜索"
+                            contentDescription = "Search"
                         )
                     },
                     keyboardOptions = KeyboardOptions(
@@ -103,7 +103,7 @@ fun NewSearchScreen(
                     singleLine = true
                 )
 
-                // 搜索结果
+                // Search results
                 Spacer(modifier = Modifier.height(16.dp))
 
                 when (val state = uiState) {
@@ -112,7 +112,7 @@ fun NewSearchScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("请输入关键字搜索仓库")
+                            Text("Please enter keywords to search for repositories")
                         }
                     }
 
@@ -130,16 +130,16 @@ fun NewSearchScreen(
                         val repositories = searchContent.repositoriesList
 
                         Text(
-                            text = "共找到 ${searchContent.totalCount} 个仓库",
+                            text = "Found ${searchContent.totalCount} repositories",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
                         val listState = rememberLazyListState()
-                        // 监听列表滚动，实现上拉加载更多
+                        // Listen to list scrolling to implement pull-up to load more
                         val shouldLoadMore = remember {
                             derivedStateOf {
-                                // 确保列表不为空且有更多数据时才计算
+                                // Make sure the list is not empty and there is more data before calculating
                                 if (repositories.isEmpty() || !searchContent.hasMoreRepos) {
                                     false
                                 } else {
@@ -147,7 +147,7 @@ fun NewSearchScreen(
                                     val totalItemsNumber = layoutInfo.totalItemsCount
                                     val lastVisibleItemIndex =
                                         (layoutInfo.visibleItemsInfo.lastOrNull()?.index
-                                            ?: 0) + 10 // 提前10个item开始加载
+                                            ?: 0) + 10 // Start loading 10 items in advance
 
                                     lastVisibleItemIndex >= totalItemsNumber && totalItemsNumber > 0
                                 }
@@ -155,11 +155,11 @@ fun NewSearchScreen(
                         }
 
                         LaunchedEffect(shouldLoadMore.value) {
-                            // 添加额外的保护条件
+                            // Add extra protection conditions
                             if (shouldLoadMore.value &&
                                 searchContent.hasMoreRepos &&
                                 !searchContent.isLoadingMore &&
-                                repositories.isNotEmpty() // 确保列表不为空
+                                repositories.isNotEmpty() // Ensure the list is not empty
                             ) {
                                 viewModel.loadMore()
                             }
@@ -169,7 +169,7 @@ fun NewSearchScreen(
                             modifier = Modifier.fillMaxSize(),
                             state = listState
                         ) {
-                            // 确保列表不为空时才渲染items
+                            // Render items only when the list is not empty
                             if (repositories.isNotEmpty()) {
                                 items(
                                     items = repositories,
@@ -209,7 +209,7 @@ fun NewSearchScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text("加载失败：${state.message}")
+                            Text("Load failed: ${state.message}")
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = { viewModel.retry() },
@@ -218,7 +218,7 @@ fun NewSearchScreen(
                                     contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
-                                Text("重试")
+                                Text("Retry")
                             }
                         }
                     }
