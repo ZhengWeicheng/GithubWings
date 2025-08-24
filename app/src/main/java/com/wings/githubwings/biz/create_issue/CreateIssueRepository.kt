@@ -19,7 +19,7 @@ class CreateIssueRepository(private val apiService: GithubServiceApi = getServic
         return safeApiCall {
             val token = ServiceCenter.getService<ILoginApi>()!!.getAccessToken()
             apiService.createIssue(
-                "Bearer $token",
+                token,
                 owner,
                 repo,
                 issue
