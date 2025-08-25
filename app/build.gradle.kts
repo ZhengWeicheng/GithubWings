@@ -42,11 +42,11 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
             buildConfigField("String", "httpBaseUrl", "\"https://api.github.com/\"")
-            buildConfigField("String", "clientId", "\"Iv23liP7xuOG2XFosMHy\"")
+            buildConfigField("String", "clientId", "\"Ov23liqgF13gknDtnfgE\"")
             buildConfigField(
                 "String",
                 "clientSecret",
-                "\"18078bb158399ffc662ad4b5493ce62301a227f6\""
+                "\"930d9f5f7539eb818481b657597ac2fb17425328\""
             )
             buildConfigField("String", "authBaseUrl", "\"https://github.com/\"")
             buildConfigField("String", "redirectUrl", "\"github://oauth\"")
@@ -58,11 +58,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "clientId", "\"Iv23liP7xuOG2XFosMHy\"")
+            buildConfigField("String", "clientId", "\"Ov23liqgF13gknDtnfgE\"")
             buildConfigField(
                 "String",
                 "clientSecret",
-                "\"18078bb158399ffc662ad4b5493ce62301a227f6\""
+                "\"930d9f5f7539eb818481b657597ac2fb17425328\""
             )
             buildConfigField("String", "httpBaseUrl", "\"https://api.github.com/\"")
             buildConfigField("String", "authBaseUrl", "\"https://github.com/\"")

@@ -31,6 +31,7 @@ interface GithubServiceApi {
 
     @GET("repos/{owner}/{repo}")
     suspend fun getRepoDetail(
+        @Header("Authorization") token: String = "",
         @Path("owner") owner: String,
         @Path("repo") repo: String
     ): NetworkResult<GitHubRepo>
