@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        handleIntent(intent)
         // 设置状态栏透明
         enableEdgeToEdge()
         // 设置状态栏透明
